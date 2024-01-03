@@ -171,13 +171,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8dee1ede263c764abcb5768b4316b29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  approximation: 96
+  approximation: 70
   ranInterval: 32
   attractionForces:
   - 8
   - -48
   - -32
-  - 70
+  - 50
   - 0
   - 12
   - -12
