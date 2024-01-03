@@ -12,6 +12,7 @@ TagManager:
   - Particle4
   - Particle5
   - Particle6
+  - Particle7
   layers:
   - Default
   - TransparentFX

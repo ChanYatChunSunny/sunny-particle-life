@@ -181,6 +181,7 @@ MonoBehaviour:
   - 0
   - 12
   - -12
+  - -6
   maxDetectionDistances:
   - 32
   - 16
@@ -189,6 +190,7 @@ MonoBehaviour:
   - 0
   - 8
   - 16
+  - 8
   randMin: -2
   randScale: 4
   boarderRepelThreshold: 480

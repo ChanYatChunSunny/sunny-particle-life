@@ -181,12 +181,14 @@ MonoBehaviour:
   - -10
   - -2
   - 36
+  - -8
   maxDetectionDistances:
   - 32
   - 32
   - 48
   - 16
   - 28
+  - 16
   - 16
   - 16
   randMin: 0
