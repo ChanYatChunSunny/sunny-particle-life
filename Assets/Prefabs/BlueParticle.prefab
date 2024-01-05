@@ -174,9 +174,9 @@ MonoBehaviour:
   approximation: 54
   ranInterval: 0
   attractionForces:
-  - -16
+  - -128
   - 16
-  - 70
+  - 48
   - -34
   - 60
   - -128

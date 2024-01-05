@@ -174,15 +174,15 @@ MonoBehaviour:
   approximation: 54
   ranInterval: 0
   attractionForces:
-  - 0
+  - 16
   - 6
   - -34
-  - 48
-  - -45
+  - 36
+  - -48
   - -16
   - -18
   maxDetectionDistances:
-  - 0
+  - 6
   - 16
   - 6
   - 10
