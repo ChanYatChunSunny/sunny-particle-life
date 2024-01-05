@@ -183,8 +183,8 @@ MonoBehaviour:
   - -2
   - -8
   maxDetectionDistances:
-  - 4
-  - 28
+  - 6
+  - 20
   - 16
   - 8
   - 8
