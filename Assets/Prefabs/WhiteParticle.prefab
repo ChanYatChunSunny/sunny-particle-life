@@ -176,8 +176,8 @@ MonoBehaviour:
   attractionForces:
   - 8
   - -48
-  - -48
-  - 50
+  - -50
+  - 48
   - 0
   - 12
   - -12
