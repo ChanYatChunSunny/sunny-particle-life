@@ -32,11 +32,11 @@ public class Randomizer : MonoBehaviour
     /// 
     /// </summary>
     /// <param name="min"></param>
-    /// <param name="scale"></param>
-    /// <returns>a double >= min and < min+scale</returns>
-    public double GetDouble(double min, double scale) 
+    /// <param name="max"></param>
+    /// <returns>a double >= min and < max</returns>
+    public double GetDouble(double min, double max) 
     {
-        return min + GetDouble() * scale;
+        return min + GetDouble() * (max - min);
     }
 
     /// <summary>

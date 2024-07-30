@@ -13,25 +13,40 @@ public class Spawner : MonoBehaviour
     [SerializeField]
     private int numOfTypes;
     [SerializeField]
-    private GameObject[] particlePrefabsList;
+    private GameObject particlePrefab;
 
-
-
-    private int amount;
     private bool isGlobalReady;
 
     private Randomizer randomizer;
     private Partitioner partitioner;
-    //The first two indices are the x and y of the partition, the third one is the type 
+    // The first two indices are the x and y of the partition, the third one is the type 
     private LinkedList<GameObject>[][][] partitionedParticles;
-    
+
+    // Inner array is to be assigned to each type
+    private float[][] attractionForces;
+    private float[][] maxDetectionDistances;
+
+    private float[] randMins;
+    private float[] randMaxs;
+
     // Start is called before the first frame update
     void Start()
     {
         isGlobalReady = false;
         randomizer = randomizerGameObject.GetComponent<Randomizer>();
         partitioner = partitionerGameObject.GetComponent<Partitioner>();
+        // Init the types
+        attractionForces = new float[numOfTypes][];
+        maxDetectionDistances = new float[numOfTypes][];
+        randMins = new float[numOfTypes];
+        randMaxs = new float[numOfTypes];
+        for (int i = 0; i < numOfTypes; i++)
+        {
+            attractionForces[i] = new float[numOfTypes];
+            maxDetectionDistances[i] = new float[numOfTypes];
+        }
 
+        // Init the partitions
         int partitionCount = partitioner.GetPartitionCount();
         partitionedParticles = new LinkedList<GameObject>[partitionCount][][];
         for (int i = 0; i < partitionCount; i++) 
@@ -43,8 +58,27 @@ public class Spawner : MonoBehaviour
             }
         }
     }
+    public void RandomizeTypes()
+    {
+        for (int i = 0; i < numOfTypes; i++)
+        {
+            if(randomizer.GetDouble() <= 0.2)
+            {
+                randMins[i] = (float)randomizer.GetDouble(0.1, 2);
+                randMaxs[i] = randMins[i] + (float)randomizer.GetDouble(0.1, 2);
+            }
+            for (int j = 0; j < numOfTypes; j++)
+            {
+                attractionForces[i][j] = randomizer.GetInt(-128, 129);
+                maxDetectionDistances[i][j] = randomizer.GetInt(0, 33);
+            }
+        }
+    }
+
     public void Spawn(int amount) 
     {
+
+        RandomizeTypes();
         int partitionCount = partitioner.GetPartitionCount();
 
         for (int i = 0; i < partitionCount; i++) 
@@ -61,12 +95,11 @@ public class Spawner : MonoBehaviour
 
         for (int i = 0; i < amount; i++)
         {
-            int selectedType = randomizer.GetInt(0, particlePrefabsList.Length);
-            GameObject selectedParticle = particlePrefabsList[selectedType];
-            Vector2 pos = new Vector2((float)randomizer.GetDouble(-radius, radius * 2), (float)randomizer.GetDouble(-radius, radius * 2));
-            GameObject newObj = Instantiate(selectedParticle, pos, Quaternion.identity);
+            int selectedType = randomizer.GetInt(0, numOfTypes);
+            Vector2 pos = new Vector2((float)randomizer.GetDouble(-radius, radius), (float)randomizer.GetDouble(-radius, radius));
+            GameObject newObj = Instantiate(particlePrefab, pos, Quaternion.identity);
             int[] partitionIndices = partitioner.VectorToPartition(pos);
-            partitionedParticles[partitionIndices[0]][partitionIndices[1]][int.Parse(newObj.tag.Replace("Particle", ""))].AddLast(newObj);
+            partitionedParticles[partitionIndices[0]][partitionIndices[1]][selectedType].AddLast(newObj);
         }
         isGlobalReady = true;
 
@@ -86,7 +119,8 @@ public class Spawner : MonoBehaviour
                         foreach (GameObject particle in partitionedParticles[i][j][k])
                         {
                             ParticleBehavior particleBehavior = particle.GetComponent<ParticleBehavior>();
-                            particleBehavior.SetDepences(randomizer, partitioner);
+                            particleBehavior.SetDependences(randomizer, partitioner);
+                            particleBehavior.SetParticleBehavior(k, attractionForces[k], maxDetectionDistances[k], randMins[k], randMaxs[k]);
                             particleBehavior.SetPartitionedParticles(partitionedParticles);
                             particleBehavior.setGlobalReady();
                         }

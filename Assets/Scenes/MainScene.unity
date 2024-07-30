@@ -1566,20 +1566,7 @@ MonoBehaviour:
   partitionerGameObject: {fileID: 1603623217}
   radius: 450
   numOfTypes: 8
-  particlePrefabsList:
-  - {fileID: 8416140665447486737, guid: a5e401c91656a3b418e135c4fe2c215c, type: 3}
-  - {fileID: 7077180898104727062, guid: faeed4a745c029546ba00bb760d595ed, type: 3}
-  - {fileID: 5319389364527973520, guid: eef877cfa91b36e4f96f727628747dad, type: 3}
-  - {fileID: 3039736834738054835, guid: 40ef812c4ea2c804693e5cae02ca426a, type: 3}
-  - {fileID: 7077180898104727062, guid: a59f55e9da9a2bb478c7508226272390, type: 3}
-  - {fileID: 7077180898104727062, guid: c787518396cd2f448a1ac1803d4fecc0, type: 3}
-  - {fileID: 7077180898104727062, guid: e9326c3a78b53384d987f7262d4cd6a8, type: 3}
-  - {fileID: 5319389364527973520, guid: 77f32759cf7d9094ea3624dde201ce38, type: 3}
-  - {fileID: 7077180898104727062, guid: faeed4a745c029546ba00bb760d595ed, type: 3}
-  - {fileID: 5319389364527973520, guid: eef877cfa91b36e4f96f727628747dad, type: 3}
-  - {fileID: 3039736834738054835, guid: 40ef812c4ea2c804693e5cae02ca426a, type: 3}
-  - {fileID: 7077180898104727062, guid: faeed4a745c029546ba00bb760d595ed, type: 3}
-  - {fileID: 5319389364527973520, guid: eef877cfa91b36e4f96f727628747dad, type: 3}
+  particlePrefab: {fileID: 2348186870405740793, guid: 30bc9aefdcdbce046b1dc770526f5b85, type: 3}
 --- !u!4 &1228202472
 Transform:
   m_ObjectHideFlags: 0
