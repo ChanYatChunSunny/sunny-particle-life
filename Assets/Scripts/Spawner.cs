@@ -122,12 +122,12 @@ public class Spawner : MonoBehaviour
                             particleBehavior.SetDependences(randomizer, partitioner);
                             particleBehavior.SetParticleBehavior(k, attractionForces[k], maxDetectionDistances[k], randMins[k], randMaxs[k]);
                             particleBehavior.SetPartitionedParticles(partitionedParticles);
-                            particleBehavior.setGlobalReady();
                         }
                     }
                     
                 }
             }
+            StaticData.SimRunning = true;
         }
         isGlobalReady = false;
     }

@@ -39,7 +39,6 @@ public class ParticleBehavior : MonoBehaviour
     private Randomizer randomizer;
     private Partitioner partitioner;
     private LinkedList<GameObject>[][][] partitionedParticles;
-    private bool isGlobalReady = false;
     private int[] currPartition;
 
     public void SetDependences(Randomizer randomizer, Partitioner partitioner) 
@@ -92,11 +91,6 @@ public class ParticleBehavior : MonoBehaviour
     {
         this.partitionedParticles = partitionedParticles;
     }
-    //Call this function omce every other particle is ready
-    public void setGlobalReady()
-    {
-        isGlobalReady = true;
-    }
 
     // Start is called before the first frame update
     void Start()
@@ -113,7 +107,8 @@ public class ParticleBehavior : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!isGlobalReady) { return; }
+        body.simulated = StaticData.SimRunning;
+        if (!StaticData.SimRunning) { return; }
 
         //Only do the calculation once per "approximation" amount of fixed updates for performance
         //This may also greatly influence the characteristics of the particles
