@@ -1,9 +1,5 @@
-using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class ParticleBehavior : MonoBehaviour
 {
@@ -14,47 +10,80 @@ public class ParticleBehavior : MonoBehaviour
     private int ranInterval;
 
     [SerializeField]
+    private float boarderRepelThreshold;
+
     private float[] attractionForces;
-    [SerializeField]
     private float[] maxDetectionDistances;
 
-    [SerializeField]
-    private double randMin;
-    [SerializeField]
-    private double randScale;
-
-    [SerializeField]
-    private float boarderRepelThreshold;
+    private float randMin;
+    private float randMax;
 
     private int approximationCounter;
     private int ranIntervalCounter;
 
-    private int numOfParticleTypes;
 
     private int particleType;
+    public int ParticleType
+    {
+        get { return particleType; }
+    }
+
 
     private Rigidbody2D body;
     private Randomizer randomizer;
     private Partitioner partitioner;
     private LinkedList<GameObject>[][][] partitionedParticles;
-    private bool isGlobalReady = false;
     private int[] currPartition;
 
-    public void SetDepences(Randomizer randomizer, Partitioner partitioner) 
+    public void SetDependences(Randomizer randomizer, Partitioner partitioner) 
     {
         this.randomizer = randomizer;
         this.partitioner = partitioner;
     }
 
-    //Set the particles that this particle should be aware of
+    // Set the actual behavior 
+    public void SetParticleBehavior(int particleType, float[] attractionForces, float[] maxDetectionDistances, float randMin, float randMax)
+    {
+        this.particleType = particleType;
+        SpriteRenderer spriteRenderer = this.GetComponent<SpriteRenderer>();
+        switch (particleType)
+        {
+            case 0:
+                spriteRenderer.color = Color.black;
+                break;
+            case 1:
+                spriteRenderer.color = Color.white;
+                break;
+            case 2:
+                spriteRenderer.color = Color.red;
+                break;
+            case 3:
+                spriteRenderer.color = Color.green;
+                break;
+            case 4:
+                spriteRenderer.color = Color.blue;
+                break;
+            case 5:
+                spriteRenderer.color = Color.yellow;
+                break;
+            case 6:
+                spriteRenderer.color = Color.cyan;
+                break;
+            default:
+                spriteRenderer.color = Color.magenta;
+                break;
+              
+        }
+        this.attractionForces = attractionForces;
+        this.maxDetectionDistances = maxDetectionDistances;
+        this.randMin = randMin;
+        this.randMax = randMax;
+    }
+
+    //Set the particles that this particle should be aware of, do NOT change ref to the LinkedList
     public void SetPartitionedParticles(LinkedList<GameObject>[][][] partitionedParticles)
     {
         this.partitionedParticles = partitionedParticles;
-    }
-    //Call this function omce every other particle is ready
-    public void setGlobalReady()
-    {
-        isGlobalReady = true;
     }
 
     // Start is called before the first frame update
@@ -66,17 +95,12 @@ public class ParticleBehavior : MonoBehaviour
         body = this.GetComponent<Rigidbody2D>();
 
         currPartition = partitioner.VectorToPartition(this.transform.position);
-
-        numOfParticleTypes = attractionForces.Length;
-
-        particleType = int.Parse(this.tag.Replace("Particle", ""));
-
-
     }
 
     void FixedUpdate()
     {
-        if (!isGlobalReady) { return; }
+        body.simulated = StaticData.SimRunning;
+        if (!StaticData.SimRunning) { return; }
 
         //Only do the calculation once per "approximation" amount of fixed updates for performance
         //This may also greatly influence the characteristics of the particles
@@ -130,7 +154,7 @@ public class ParticleBehavior : MonoBehaviour
         {
             if (!partitioner.IsPartitionValid(neighbours[i])) { continue; }
             LinkedList<GameObject>[] particlesInPartiton = partitionedParticles[neighbours[i][0]][neighbours[i][1]];
-            for (int j = 0; j < numOfParticleTypes; j++)
+            for (int j = 0; j < StaticData.NumOfTypes; j++)
             {
                 foreach (GameObject particle in particlesInPartiton[j])
                 {
@@ -150,6 +174,6 @@ public class ParticleBehavior : MonoBehaviour
 
     private void RandomWalk() 
     {
-        body.AddForce(new Vector2((float)randomizer.GetDouble(randMin, randScale), (float)randomizer.GetDouble(randMin, randScale)));
+        body.AddForce(new Vector2((float)randomizer.GetDouble(randMin, randMax), (float)randomizer.GetDouble(randMin, randMax)));
     }
 }
