@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+using UnityEngine;
 
 static class StaticData
 {
+    public const int NumOfTypes = 8;
+    public static readonly String ConfigPath = Application.persistentDataPath + "/config.tsv";
     private static bool simRunning = false;
-
     public static bool SimRunning
     {
         get { return simRunning; }

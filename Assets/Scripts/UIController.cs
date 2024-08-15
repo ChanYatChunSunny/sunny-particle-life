@@ -1,14 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using TMPro;
 using System;
+using System.Collections;
+using System.IO;
+using System.Text;
+using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class UIController : MonoBehaviour
 {
     [SerializeField]
-    private TMP_Text wrongText;
+    private TMP_Text infoText;
     [SerializeField]
     private TMP_InputField seedField;
     [SerializeField]
@@ -36,12 +37,12 @@ public class UIController : MonoBehaviour
     private Spawner spawner;
 
     private int selectedType;
-
+  
     // Start is called before the first frame update
     void Start()
     {
         spawner = spawnerObj.GetComponent<Spawner>();
-        wrongText.gameObject.SetActive(false);
+        infoText.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -49,7 +50,7 @@ public class UIController : MonoBehaviour
     {
         if (spawner.ConfigChanged)
         {
-           for(int i = 0; i < 8; i++)
+           for(int i = 0; i < StaticData.NumOfTypes; i++)
             {
                 float force = spawner.GetAttractionForce(selectedType, i);
                 forceSliders[i].value = force;
@@ -61,9 +62,21 @@ public class UIController : MonoBehaviour
         }
     }
 
+    private void DisplayInfoText(String str)
+    {
+        infoText.text = str;
+        infoText.gameObject.SetActive(true);
+        StartCoroutine(WaitAndHideInfoText());
+    }
+    private IEnumerator WaitAndHideInfoText()
+    {
+        yield return new WaitForSeconds(2);
+        infoText.gameObject.SetActive(false);
+    }
+
     public void PressStart() 
     {
-        wrongText.gameObject.SetActive(false);
+        infoText.gameObject.SetActive(false);
         try
         {
             int seed = int.Parse(seedField.text);
@@ -76,18 +89,18 @@ public class UIController : MonoBehaviour
             }
             else
             {
-                wrongText.gameObject.SetActive(true);
+                DisplayInfoText("Seed and size must be positive integer.");
             }
         }
         catch (Exception) 
         {
-            wrongText.gameObject.SetActive(true);
+            DisplayInfoText("Seed and size must be positive integer.");
         }
     }
     public void SelectParticleType(int type)
     {
         selectedType = type;
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < StaticData.NumOfTypes; i++)
         {
             forceSliders[i].value = spawner.GetAttractionForce(type, i);
             distanceSliders[i].value = spawner.GetMaxDetectionDistance(type, i);
@@ -101,5 +114,70 @@ public class UIController : MonoBehaviour
     public void SetDistance(Slider slider)
     {
         spawner.SetMaxDetectionDistance(selectedType, int.Parse(slider.gameObject.name.Replace("Distance", "").Replace("Slider", "")), slider.value);
+    }
+    /*
+     * Config file format:
+     * 8 rows of force i for 8 j
+     * 8 rows of distance i for 8 j
+     */
+
+    public void SaveConfig()
+    {
+        
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < StaticData.NumOfTypes; i++)
+        {
+            for (int j = 0; j < StaticData.NumOfTypes; j++)
+            {
+                sb.Append(spawner.GetAttractionForce(i, j).ToString("0.00"));
+                sb.Append("\t");
+            }
+            sb.Append("\n");
+        }
+        for (int i = 0; i < StaticData.NumOfTypes; i++)
+        {
+            for (int j = 0; j < StaticData.NumOfTypes; j++)
+            {
+                sb.Append(spawner.GetMaxDetectionDistance(i, j).ToString("0.00"));
+                sb.Append("\t");
+            }
+            sb.Append("\n");
+        }
+        
+        File.WriteAllText(StaticData.ConfigPath, sb.ToString());
+        DisplayInfoText("File saved at " + StaticData.ConfigPath + ".");
+    }
+
+    public void LoadConfig()
+    {
+
+        if (!File.Exists(StaticData.ConfigPath))
+        {
+            DisplayInfoText("Config could not be found at " + StaticData.ConfigPath + ".");
+        }
+        try
+        {
+            String[] lines = File.ReadAllLines(StaticData.ConfigPath);
+            for(int i = 0; i < StaticData.NumOfTypes; i++)
+            {
+                String[] valStrs = lines[i].Split("\t");
+                for(int j = 0; j < StaticData.NumOfTypes; j++)
+                {
+                    spawner.SetAttractionForce(i, j, float.Parse(valStrs[j]));
+                }
+            }
+            for (int i = 0; i < StaticData.NumOfTypes; i++)
+            {
+                String[] valStrs = lines[i + StaticData.NumOfTypes].Split("\t");
+                for (int j = 0; j < StaticData.NumOfTypes; j++)
+                {
+                    spawner.SetMaxDetectionDistance(i, j, float.Parse(valStrs[j]));
+                }
+            }
+        }
+        catch (Exception)
+        {
+            DisplayInfoText("Config at " + StaticData.ConfigPath + " is corrupted.");
+        }
     }
 }

@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,8 +9,6 @@ public class Spawner : MonoBehaviour
     private GameObject partitionerGameObject;
     [SerializeField]
     private float radius;
-    [SerializeField]
-    private int numOfTypes;
     [SerializeField]
     private GameObject particlePrefab;
 
@@ -66,15 +62,17 @@ public class Spawner : MonoBehaviour
         randomizer = randomizerGameObject.GetComponent<Randomizer>();
         partitioner = partitionerGameObject.GetComponent<Partitioner>();
         // Init the types
-        attractionForces = new float[numOfTypes][];
-        maxDetectionDistances = new float[numOfTypes][];
-        randMins = new float[numOfTypes];
-        randMaxs = new float[numOfTypes];
-        for (int i = 0; i < numOfTypes; i++)
+        attractionForces = new float[StaticData.NumOfTypes][];
+        maxDetectionDistances = new float[StaticData.NumOfTypes][];
+        randMins = new float[StaticData.NumOfTypes];
+        randMaxs = new float[StaticData.NumOfTypes];
+        for (int i = 0; i < StaticData.NumOfTypes; i++)
         {
-            attractionForces[i] = new float[numOfTypes];
-            maxDetectionDistances[i] = new float[numOfTypes];
-            for(int j = 0; j < numOfTypes; j++)
+            randMins[i] = 0f;
+            randMaxs[i] = 0f;
+            attractionForces[i] = new float[StaticData.NumOfTypes];
+            maxDetectionDistances[i] = new float[StaticData.NumOfTypes];
+            for(int j = 0; j < StaticData.NumOfTypes; j++)
             {
                 attractionForces[i][j] = 0f;
                 maxDetectionDistances[i][j] = 0f;
@@ -88,23 +86,46 @@ public class Spawner : MonoBehaviour
             partitionedParticles[i] = new LinkedList<GameObject>[partitionCount][];
             for (int j = 0; j < partitionCount; j++) 
             {
-                partitionedParticles[i][j] = new LinkedList<GameObject>[numOfTypes];
+                partitionedParticles[i][j] = new LinkedList<GameObject>[StaticData.NumOfTypes];
             }
         }
     }
     public void RandomizeTypes()
     {
-        for (int i = 0; i < numOfTypes; i++)
+        for (int i = 0; i < StaticData.NumOfTypes; i++)
         {
-            if(randomizer.GetDouble() <= 0.2)
+            //if(randomizer.GetDouble() <= 0.2)
+            //{
+            //    randMins[i] = (float)randomizer.GetDouble(0.1, 2);
+            //    randMaxs[i] = randMins[i] + (float)randomizer.GetDouble(0.1, 2);
+            //}
+            for (int j = 0; j < StaticData.NumOfTypes; j++)
             {
-                randMins[i] = (float)randomizer.GetDouble(0.1, 2);
-                randMaxs[i] = randMins[i] + (float)randomizer.GetDouble(0.1, 2);
-            }
-            for (int j = 0; j < numOfTypes; j++)
-            {
-                attractionForces[i][j] = (float)randomizer.GetDouble(-128, 129);
-                maxDetectionDistances[i][j] = (float)randomizer.GetDouble(0, 49);
+                double attraction;
+                if (randomizer.GetDouble() < 0.9f)
+                {
+                    attraction = randomizer.GetDouble(0, 32);
+                }
+                else
+                {
+                    attraction = randomizer.GetDouble(32, 128);
+                }
+                if(randomizer.GetDouble() > 0.5f)
+                {
+                    attraction = -attraction;
+                }
+                attractionForces[i][j] = (float)attraction;
+
+                double distance;
+                if (randomizer.GetDouble() < 0.8f)
+                {
+                    distance = randomizer.GetDouble(0, 18);
+                }
+                else
+                {
+                    distance = randomizer.GetDouble(18, 48);
+                }
+                maxDetectionDistances[i][j] = (float)distance;
             }
         }
         ConfigChanged = true;
@@ -123,7 +144,7 @@ public class Spawner : MonoBehaviour
         {
             for (int j = 0; j < partitionCount; j++)
             {
-                for (int k = 0; k < numOfTypes; k++)
+                for (int k = 0; k < StaticData.NumOfTypes; k++)
                 {
                     partitionedParticles[i][j][k] = new LinkedList<GameObject>();
                 }
@@ -133,7 +154,7 @@ public class Spawner : MonoBehaviour
 
         for (int i = 0; i < amount; i++)
         {
-            int selectedType = randomizer.GetInt(0, numOfTypes);
+            int selectedType = randomizer.GetInt(0, StaticData.NumOfTypes);
             Vector2 pos = new Vector2((float)randomizer.GetDouble(-radius, radius), (float)randomizer.GetDouble(-radius, radius));
             GameObject newObj = Instantiate(particlePrefab, pos, Quaternion.identity);
             int[] partitionIndices = partitioner.VectorToPartition(pos);
@@ -152,7 +173,7 @@ public class Spawner : MonoBehaviour
             {
                 for (int j = 0; j < partitionCount; j++)
                 {
-                    for (int k = 0; k < numOfTypes; k++)
+                    for (int k = 0; k < StaticData.NumOfTypes; k++)
                     {
                         foreach (GameObject particle in partitionedParticles[i][j][k])
                         {
@@ -177,7 +198,7 @@ public class Spawner : MonoBehaviour
         {
             for (int j = 0; j < partitionCount; j++)
             {
-                for (int k = 0; k < numOfTypes; k++) 
+                for (int k = 0; k < StaticData.NumOfTypes; k++) 
                 {
                     if (partitionedParticles[i][j][k] != null)
                     {

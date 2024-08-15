@@ -1,9 +1,5 @@
-using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class ParticleBehavior : MonoBehaviour
 {
@@ -24,8 +20,6 @@ public class ParticleBehavior : MonoBehaviour
 
     private int approximationCounter;
     private int ranIntervalCounter;
-
-    private int numOfParticleTypes;
 
 
     private int particleType;
@@ -101,8 +95,6 @@ public class ParticleBehavior : MonoBehaviour
         body = this.GetComponent<Rigidbody2D>();
 
         currPartition = partitioner.VectorToPartition(this.transform.position);
-
-        numOfParticleTypes = attractionForces.Length;
     }
 
     void FixedUpdate()
@@ -162,7 +154,7 @@ public class ParticleBehavior : MonoBehaviour
         {
             if (!partitioner.IsPartitionValid(neighbours[i])) { continue; }
             LinkedList<GameObject>[] particlesInPartiton = partitionedParticles[neighbours[i][0]][neighbours[i][1]];
-            for (int j = 0; j < numOfParticleTypes; j++)
+            for (int j = 0; j < StaticData.NumOfTypes; j++)
             {
                 foreach (GameObject particle in particlesInPartiton[j])
                 {
